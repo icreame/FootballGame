@@ -1,10 +1,10 @@
-from bloodfootball import BloodFootballGame
+from football_game import FootballGame
 import pygame
 
 
 def main():
     pygame.init()
-    game = BloodFootballGame()
+    game = FootballGame()
     game.run()
     pygame.quit()
 
