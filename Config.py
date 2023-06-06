@@ -7,16 +7,16 @@ class Config:
     # FPS
     FPS = 60
     # 开始界面大小
-
     START_SCREENSIZE = (512, 512)
-
     GAME_SCREENSIZE = (1200, 800)
     # 标题
-    TITLE = '热血足球'
+    TITLE = 'Futsal'
     # 颜色
     WHITE = (255, 255, 255)
     RED = (255, 0, 0)
     LIGHTGREEN = (0, 100, 0)
+    # 模式选择
+    IS_TWO_PLAYERS = False
     # 背景音乐
     BGM_PATH = os.path.join(root, 'resources/audios/bgm.flac')
     # 游戏图片
@@ -36,6 +36,4 @@ class Config:
             os.path.join(root, 'resources/images/door1.bmp'),
             os.path.join(root, 'resources/images/door2.bmp'),
         ],
-        'background_start': os.path.join(root, 'resources/images/background_start.jpg'),
     }
-

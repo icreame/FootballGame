@@ -3,7 +3,7 @@ import sys
 
 
 # 窗口创建
-def InitPygame(screensize, title='热血足球', init_mixer=True):
+def InitPygame(screensize, title='Futsal', init_mixer=True):
     pygame.init()
     if init_mixer:
         pygame.mixer.init()
@@ -18,6 +18,6 @@ def QuitGame(use_pygame=True):
     sys.exit()
 
 
-def playbgm(self):
+def play_bgm(self):
     pygame.mixer.music.load(self.bgm_path)
     pygame.mixer.music.play(-1, 0, 0)

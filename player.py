@@ -29,7 +29,6 @@ class Player(pygame.sprite.Sprite):
                 image.subsurface((64, 144, 32, 48)), image.subsurface((96, 144, 32, 48))
             ],
         }
-        self.po = position  # 位置备份
         self.position = list(position)
         self.autocontrol = autocontrol
         self.playerType = playerType
@@ -62,19 +61,20 @@ class Player(pygame.sprite.Sprite):
         # 切换人物动作，实现动画效果
         self.switch()
         # 根据方向移动人物
+        ori_position = self.position.copy()
         speed = self.speed * self.direction[0], self.speed * self.direction[1]
         self.position[0] = min(max(0, self.position[0] + speed[0]), screensize[0] - 48)
         self.position[1] = min(max(0, self.position[1] + speed[1]), screensize[1] - 48)
         self.rect.left, self.rect.top = self.position
         # 判断人物是否在球门区域
-        if self.rect.top > 310 and self.rect.bottom < 650:
-            # 判断球员s是否靠近球门边界
-            if self.rect.right > 885:  # 离球门的右边界很近
-                self.position[0] = min(self.position[0], 884)
+        if self.rect.bottom > 305 and self.rect.top < 505:
+            # 判断球员是否靠近球门边界
+            if self.rect.right > 1121:  # 离球门的右边界很近
+                self.position = ori_position
+                self.rect.left, self.rect.top = self.position
             elif self.rect.left < 75:  # 离球门左边界很近
-                self.position[0] = max(self.position[0], 76)
-        # 更新图像位置
-        self.rect.left, self.rect.top = self.position
+                self.position = ori_position
+                self.rect.left, self.rect.top = self.position
         # 设置为静止状态
         self.ismoving = False
 
@@ -86,16 +86,11 @@ class Player(pygame.sprite.Sprite):
             # 守门
             def goalkeep(self):
                 self.switch()
-                # 大于305，小于460
-                self.position[0] = min(max(self.po[0], self.position[0] + self.direction[0] * self.speed),
-                                       self.po[0] + 40)
-                self.position[1] = min(max(305, self.position[1] + self.direction[1] * self.speed), 460)
+                # 大于305，小于505
+                self.position[1] = min(max(305, self.position[1] + self.direction[1] * self.speed), 505)
                 self.rect.left, self.rect.top = self.position
-                if self.rect.top == 305 or self.rect.top == 460:  # 反向走
+                if self.rect.top == 305 or self.rect.bottom == 505:  # 反向走
                     self.direction = self.direction[0], -self.direction[1]
-                    self.setdirection(self.direction)
-                if self.rect.left == self.po[0] or self.rect.left == self.po[0] + 40:
-                    self.direction = -self.direction[0], self.direction[1]
                     self.setdirection(self.direction)
 
             # 守门员拿球就随机射球
@@ -106,9 +101,6 @@ class Player(pygame.sprite.Sprite):
                         self.setdirection((1, 0))
                         self.prepare_kicking_count += 1
                         # 通过计数机制，可以控制球员准备踢球的频率，以避免过于频繁地执行该动作。
-                        # 这可能是为了增加游戏的难度或使球员的行为更加真实和可预测。
-                        # 计数机制可以在一定程度上限制特定动作的使用次数，
-                        # 并为游戏提供更好的平衡和可玩性。
                         if self.prepare_kicking_count > self.prepare_kicking_freq:
                             self.prepare_kicking_count = 0
                             self.prepare_kicking = False
@@ -144,7 +136,7 @@ class Player(pygame.sprite.Sprite):
                     self.direction = min(max(350 - self.rect.left, -1), 1), min(max(405 - self.rect.top, -1), 1)
                 self.setdirection(self.direction)
                 # 射门
-                if (random.random() > 0.96 and 150 < self.position[0] < 1150) or self.prepare_kicking:
+                if (random.random() > 0.9 and 75 < self.position[0] < 1120) or self.prepare_kicking:
                     if self.grounpId == 1:
                         # 射门方向
                         self.direction = min(max(1190 - self.rect.left, -1), 1), min(max(405 - self.rect.top, -1), 1)
@@ -166,10 +158,13 @@ class Player(pygame.sprite.Sprite):
                     self.position[1] = min(max(0, self.position[1] + speed[1]), screensize[1] - 48)
                     self.rect.left, self.rect.top = self.position
                     # 保证人物不进入门框
-                    if self.rect.top > 305 and self.rect.bottom < 460 and (
-                            self.rect.right > 1121 or self.rect.left < 75):
-                        self.position = ori_position
-                        self.rect.left, self.rect.top = self.position
+                    if self.rect.bottom > 310 and self.rect.top < 500:
+                        if self.rect.right > 1121:
+                            self.position = ori_position
+                            self.rect.left, self.rect.top = self.position
+                        elif self.rect.left < 75:
+                            self.position = ori_position
+                            self.rect.left, self.rect.top = self.position
             # 球没在自己的脚下
             else:
                 # 各司其职
@@ -194,17 +189,20 @@ class Player(pygame.sprite.Sprite):
                 self.setdirection(self.direction)
                 # 计算球员的移动速度
                 speed = self.speed * self.direction[0], self.speed * self.direction[1]
-                # 备份当前位置
                 ori_position = self.position.copy()
                 # 将球员的位置限制在屏幕范围内
                 self.position[0] = min(max(0, self.position[0] + speed[0]), screensize[0] - 48)
                 self.position[1] = min(max(0, self.position[1] + speed[1]), screensize[1] - 48)
-                # 更新人物位置
                 self.rect.left, self.rect.top = self.position
-                if self.rect.top > 305 and self.rect.bottom < 460 and (
-                        self.rect.right > 1121 or self.rect.left < 75):
-                    self.position = ori_position
-                    self.rect.left, self.rect.top = self.position
+                # 更新人物位置
+                if self.rect.bottom > 310 and self.rect.top < 500:
+                    # 判断球员是否靠近球门边界
+                    if self.rect.right > 1121:  # 离球门的右边界很近
+                        self.position = ori_position
+                        self.rect.left, self.rect.top = self.position
+                    elif self.rect.left < 75:  # 离球门左边界很近
+                        self.position = ori_position
+                        self.rect.left, self.rect.top = self.position
 
     def switch(self):
         self.count = self.count + 1
